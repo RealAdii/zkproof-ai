@@ -8,13 +8,16 @@
 
 ## The Problem
 
-AI agents are everywhere—posting on social media, trading crypto, giving advice. But how do you know it's actually AI?
+AI agents are everywhere, posting on social media, trading crypto, giving advice. But how do you know it's actually AI?
 
-- Someone could claim their bot uses GPT-4, but have humans writing responses
+- Someone could claim their bot uses GPT-5, but have humans writing responses
 - An AI agent could claim autonomous trading, but humans could be pulling strings
 - There's no way to verify. You just have to **trust them**
 
-This already happened. A popular AI agent got accused of having human moderators. They had to leak internal logs to prove autonomy. **That's not a solution.**
+<img width="590" height="863" alt="Screenshot 2026-02-01 at 4 59 49 PM" src="https://github.com/user-attachments/assets/f9df5847-fc40-4539-828b-247d2fc31a58" />
+This already happened. 
+
+A popular AI agent Forum got accused of being human. **That's not a solution.**
 
 ## The Solution
 
@@ -215,8 +218,6 @@ Report security issues to: [security contact]
 ## Credits
 
 - [Reclaim Protocol](https://reclaimprotocol.org/) - zkTLS infrastructure
-- [EigenLayer](https://eigenlayer.xyz/) - Restaking & AVS platform
-- [EigenCloud](https://eigencloud.xyz/) - Verifiable AI infrastructure
 - [Anthropic](https://anthropic.com/) - Claude AI
 
 ## License
