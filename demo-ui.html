@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifiable AI Inference</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+      min-height: 100vh;
+      color: #e0e0e0;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 0.95rem;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      height: calc(100vh - 140px);
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .panel-header .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #28c840; }
+
+    .panel-title {
+      margin-left: 8px;
+      font-size: 0.8rem;
+      color: #888;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .code-block {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      background: rgba(0, 0, 0, 0.3);
+      height: 100%;
+      padding: 16px;
+      overflow: auto;
+    }
+
+    .code-block pre {
+      white-space: pre-wrap;
+    }
+
+    /* Syntax highlighting */
+    .keyword { color: #c792ea; }
+    .function { color: #82aaff; }
+    .string { color: #c3e88d; }
+    .comment { color: #546e7a; }
+    .number { color: #f78c6c; }
+    .variable { color: #ffcb6b; }
+    .property { color: #80cbc4; }
+
+    .input-section {
+      margin-bottom: 16px;
+    }
+
+    .input-section label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #aaa;
+      font-size: 0.85rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #00d4ff;
+    }
+
+    button {
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-size: 0.85rem;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .result-card {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .result-card.response {
+      border-left: 3px solid #00d4ff;
+    }
+
+    .result-card.proof {
+      border-left: 3px solid #7b2cbf;
+    }
+
+    .result-card.verified {
+      border-left: 3px solid #28c840;
+    }
+
+    .result-card h3 {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .result-card .value {
+      font-size: 0.95rem;
+      color: #fff;
+      line-height: 1.5;
+    }
+
+    .proof-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .proof-item {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    .proof-item label {
+      display: block;
+      font-size: 0.65rem;
+      color: #666;
+      margin-bottom: 3px;
+    }
+
+    .proof-item .value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #00d4ff;
+    }
+
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(40, 200, 64, 0.1);
+      border: 1px solid rgba(40, 200, 64, 0.3);
+      padding: 10px 14px;
+      border-radius: 6px;
+      color: #28c840;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .verified-badge svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(0, 212, 255, 0.3);
+      border-top-color: #00d4ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .status-steps {
+      margin-top: 12px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      color: #555;
+      font-size: 0.8rem;
+      transition: color 0.3s;
+    }
+
+    .step.active { color: #00d4ff; }
+    .step.done { color: #28c840; }
+
+    /* Raw Proof Panel */
+    .raw-proof-container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .raw-proof-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .raw-proof-header h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .raw-json {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 12px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: #e0e0e0;
+      overflow: auto;
+      white-space: pre;
+      line-height: 1.4;
+    }
+
+    .raw-json .key { color: #82aaff; }
+    .raw-json .string { color: #c3e88d; }
+    .raw-json .number { color: #f78c6c; }
+    .raw-json .boolean { color: #c792ea; }
+    .raw-json .null { color: #546e7a; }
+
+    .placeholder-text {
+      color: #555;
+      font-style: italic;
+      text-align: center;
+      padding: 40px 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Verifiable AI Inference</h1>
+      <p class="subtitle">Cryptographic proof that AI responses are real • Powered by zkTLS</p>
+    </header>
+
+    <div class="main-grid">
+      <!-- Column 1: Code -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="panel-title">verifiable-inference.ts</span>
+        </div>
+        <div class="code-block">
+          <pre><code><span class="keyword">import</span> { <span class="variable">ReclaimClient</span> } <span class="keyword">from</span> <span class="string">"@reclaimprotocol/zk-fetch"</span>;
+<span class="keyword">import</span> { <span class="variable">verifyProof</span> } <span class="keyword">from</span> <span class="string">"@reclaimprotocol/js-sdk"</span>;
+
+<span class="comment">// Initialize zkTLS client</span>
+<span class="keyword">const</span> <span class="variable">client</span> = <span class="keyword">new</span> <span class="function">ReclaimClient</span>(
+  APP_ID,
+  APP_SECRET
+);
+
+<span class="comment">// Make verifiable request to Claude</span>
+<span class="keyword">const</span> <span class="variable">proof</span> = <span class="keyword">await</span> <span class="variable">client</span>.<span class="function">zkFetch</span>(
+  <span class="string">"https://api.anthropic.com/v1/messages"</span>,
+  {
+    <span class="property">method</span>: <span class="string">"POST"</span>,
+    <span class="property">body</span>: <span class="function">JSON.stringify</span>({
+      <span class="property">model</span>: <span class="string">"claude-3-5-haiku"</span>,
+      <span class="property">messages</span>: [{
+        <span class="property">role</span>: <span class="string">"user"</span>,
+        <span class="property">content</span>: <span class="variable">prompt</span>
+      }]
+    })
+  }
+);
+
+<span class="comment">// Extract response</span>
+<span class="keyword">const</span> <span class="variable">response</span> = <span class="variable">proof</span>
+  .<span class="property">extractedParameterValues</span>;
+<span class="keyword">const</span> <span class="variable">text</span> = <span class="variable">response</span>.<span class="property">content</span>[<span class="number">0</span>].<span class="property">text</span>;
+
+<span class="comment">// Verify cryptographically</span>
+<span class="keyword">const</span> <span class="variable">isValid</span> = <span class="keyword">await</span> <span class="function">verifyProof</span>(<span class="variable">proof</span>);
+
+<span class="comment">// ✅ Anyone can verify</span>
+<span class="comment">// No API keys needed</span>
+<span class="comment">// No trust required</span></code></pre>
+        </div>
+      </div>
+
+      <!-- Column 2: Live Demo -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="panel-title">Live Demo</span>
+        </div>
+        <div class="panel-content">
+          <div class="input-section">
+            <label>Enter your prompt</label>
+            <div class="input-row">
+              <input type="text" id="prompt" value="What is Claude?" placeholder="Ask anything...">
+              <button id="runBtn" onclick="runDemo()">Run</button>
+            </div>
+          </div>
+
+          <div id="loading" class="hidden">
+            <div class="loading">
+              <div class="spinner"></div>
+              <span>Generating verifiable response...</span>
+            </div>
+            <div class="status-steps">
+              <div class="step" id="step1">
+                <span class="step-icon">○</span>
+                <span>Connecting via zkTLS</span>
+              </div>
+              <div class="step" id="step2">
+                <span class="step-icon">○</span>
+                <span>Generating proof</span>
+              </div>
+              <div class="step" id="step3">
+                <span class="step-icon">○</span>
+                <span>Verifying</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="results" class="hidden">
+            <div class="result-card response">
+              <h3>🤖 Claude's Response</h3>
+              <div class="value" id="responseText"></div>
+            </div>
+
+            <div class="result-card proof">
+              <h3>📜 Proof Details</h3>
+              <div class="proof-grid">
+                <div class="proof-item">
+                  <label>Proof ID</label>
+                  <div class="value" id="proofId"></div>
+                </div>
+                <div class="proof-item">
+                  <label>Size</label>
+                  <div class="value" id="proofSize"></div>
+                </div>
+                <div class="proof-item">
+                  <label>Latency</label>
+                  <div class="value" id="latency"></div>
+                </div>
+                <div class="proof-item">
+                  <label>Time</label>
+                  <div class="value" id="timestamp"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-card verified">
+              <h3>🔐 Status</h3>
+              <div class="verified-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span>VERIFIED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 3: Raw Proof -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="panel-title">Raw Proof (JSON)</span>
+        </div>
+        <div class="panel-content">
+          <div class="raw-proof-container">
+            <div class="raw-proof-header">
+              <h3>Cryptographic Proof Data</h3>
+              <button class="copy-btn" onclick="copyRawProof()">Copy</button>
+            </div>
+            <div class="raw-json" id="rawProofJson">
+              <div class="placeholder-text">
+                Run a prompt to generate a proof...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentRawProof = '';
+
+    function copyRawProof() {
+      if (!currentRawProof) return;
+      navigator.clipboard.writeText(currentRawProof);
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    }
+
+    function syntaxHighlight(json) {
+      json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        let cls = 'number';
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) {
+            cls = 'key';
+          } else {
+            cls = 'string';
+          }
+        } else if (/true|false/.test(match)) {
+          cls = 'boolean';
+        } else if (/null/.test(match)) {
+          cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+      });
+    }
+
+    async function runDemo() {
+      const prompt = document.getElementById('prompt').value;
+      const btn = document.getElementById('runBtn');
+      const loading = document.getElementById('loading');
+      const results = document.getElementById('results');
+
+      btn.disabled = true;
+      results.classList.add('hidden');
+      loading.classList.remove('hidden');
+
+      // Reset steps
+      const steps = ['step1', 'step2', 'step3'];
+      steps.forEach(s => {
+        document.getElementById(s).classList.remove('active', 'done');
+        document.getElementById(s).querySelector('.step-icon').textContent = '○';
+      });
+
+      // Clear raw proof
+      document.getElementById('rawProofJson').innerHTML = '<div class="placeholder-text">Generating proof...</div>';
+
+      let currentStep = 0;
+      const stepInterval = setInterval(() => {
+        if (currentStep > 0) {
+          document.getElementById(steps[currentStep - 1]).classList.remove('active');
+          document.getElementById(steps[currentStep - 1]).classList.add('done');
+          document.getElementById(steps[currentStep - 1]).querySelector('.step-icon').textContent = '✓';
+        }
+        if (currentStep < steps.length) {
+          document.getElementById(steps[currentStep]).classList.add('active');
+          currentStep++;
+        }
+      }, 700);
+
+      try {
+        const res = await fetch('/api/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await res.json();
+        console.log('API Response:', data);
+
+        clearInterval(stepInterval);
+        steps.forEach(s => {
+          document.getElementById(s).classList.remove('active');
+          document.getElementById(s).classList.add('done');
+          document.getElementById(s).querySelector('.step-icon').textContent = '✓';
+        });
+
+        if (!data.success) {
+          throw new Error(data.error || 'Unknown error');
+        }
+
+        setTimeout(() => {
+          loading.classList.add('hidden');
+          results.classList.remove('hidden');
+
+          // Basic info
+          document.getElementById('responseText').textContent = data.text || 'No response';
+          document.getElementById('proofId').textContent = data.proofId || 'N/A';
+          document.getElementById('proofSize').textContent = (data.proofSize || 0) + ' bytes';
+          document.getElementById('latency').textContent = (data.latency || '0') + 's';
+          document.getElementById('timestamp').textContent = data.timestamp ? new Date(data.timestamp).toLocaleTimeString() : 'N/A';
+
+          // Raw JSON with syntax highlighting
+          currentRawProof = data.rawProof || JSON.stringify(data.proof, null, 2);
+          document.getElementById('rawProofJson').innerHTML = syntaxHighlight(currentRawProof);
+
+        }, 400);
+
+      } catch (err) {
+        clearInterval(stepInterval);
+        console.error('Error:', err);
+        alert('Error: ' + (err.message || err));
+        loading.classList.add('hidden');
+      }
+
+      btn.disabled = false;
+    }
+  </script>
+</body>
+</html>
