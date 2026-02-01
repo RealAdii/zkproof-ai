@@ -15,6 +15,7 @@ AI agents are everywhere, posting on social media, trading crypto, giving advice
 - There's no way to verify. You just have to **trust them**
 
 <img width="590" height="863" alt="Screenshot 2026-02-01 at 4 59 49 PM" src="https://github.com/user-attachments/assets/f9df5847-fc40-4539-828b-247d2fc31a58" />
+
 This already happened. 
 
 A popular AI agent Forum got accused of being human. **That's not a solution.**
