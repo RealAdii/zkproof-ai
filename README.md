@@ -54,7 +54,6 @@ console.log(verification.isValid); // true
 - **Drop-in replacement** - Works with existing Claude/Anthropic code
 - **Zero-knowledge** - API keys stay private, proofs are public
 - **Third-party verifiable** - Anyone can verify without trusting you
-- **Multiple providers** - Claude (zkTLS) + EigenAI (deterministic)
 
 ## Quick Start
 
@@ -115,23 +114,6 @@ const serialized = client.serializeResult(result);
 const isValid = await VerifiableClaude.verifySerializedProof(serialized);
 ```
 
-### VerifiableEigenAI
-
-```typescript
-import { createVerifiableEigenAI } from './src';
-
-const client = createVerifiableEigenAI({
-  apiKey: string, // EigenAI API key
-});
-
-// Deterministic inference with seed
-const result = await client.chat("Hello", { seed: 42 });
-
-// Verify by re-execution
-const verification = await client.verify(result);
-// Anyone can re-run with same seed to verify
-```
-
 ## How It Works
 
 ### zkTLS (Reclaim Protocol)
@@ -155,37 +137,18 @@ const verification = await client.verify(result);
 3. Proof cryptographically binds request → response
 4. Anyone can verify the proof without seeing the API key
 
-### EigenAI (Deterministic)
-
-1. Request includes a `seed` parameter
-2. EigenAI returns deterministic output for that seed
-3. Verification = re-run with same seed, check output matches
-4. Built on EigenLayer for cryptoeconomic security
-
 ## Project Structure
 
 ```
 verifiable-inference/
 ├── src/
 │   ├── index.ts      # VerifiableClaude (zkTLS)
-│   ├── eigenai.ts    # VerifiableEigenAI (deterministic)
 │   └── types.ts      # TypeScript interfaces
 ├── demo.ts           # Terminal demo
 ├── demo-ui.html      # Web UI demo
 ├── server.ts         # Demo server
-├── example.ts        # Usage examples
-└── example-eigenai.ts
+└── example.ts        # Usage examples
 ```
-
-## Verification Methods Compared
-
-| Aspect | Claude + Reclaim | EigenAI |
-|--------|------------------|---------|
-| **Proves** | Response came from Anthropic | Output is reproducible |
-| **Verification** | ZK proof verification | Re-execution |
-| **Models** | Claude 3.5, Claude 3, etc. | gpt-oss-120b, Qwen3-32B |
-| **Latency** | +1-2s (proof generation) | Same as normal |
-| **Third-party verify** | Check ZK proof | Re-run inference |
 
 ## Use Cases
 
@@ -212,8 +175,6 @@ npm run build
 - **Never commit `.env`** - It's in `.gitignore`
 - **API keys are redacted** from proofs - Safe to share proofs publicly
 - **Proofs are self-contained** - Verifiable without any secrets
-
-Report security issues to: [security contact]
 
 ## Credits
 

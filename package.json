@@ -1,7 +1,7 @@
 {
-  "name": "verifiable-inference",
+  "name": "zkproof-ai",
   "version": "1.0.0",
-  "description": "Verifiable AI inference using zkTLS (Reclaim Protocol) and deterministic execution (EigenAI) - cryptographic proof that responses came from AI providers",
+  "description": "Cryptographic proof that AI responses are real - verifiable AI inference using zkTLS",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -11,30 +11,27 @@
     "demo": "tsx demo.ts",
     "demo:ui": "tsx server.ts",
     "demo:mock": "tsx demo-mock.ts",
-    "demo:docker": "docker build -t verifiable-inference . && docker run --env-file .env verifiable-inference",
+    "demo:docker": "docker build -t zkproof-ai . && docker run --env-file .env zkproof-ai",
     "example": "tsx example.ts",
-    "example:eigenai": "tsx example-eigenai.ts",
     "test": "vitest"
   },
   "keywords": [
     "claude",
     "anthropic",
-    "eigenai",
-    "eigencloud",
     "zktls",
     "reclaim",
     "verifiable",
     "ai",
     "zkproof",
-    "deterministic"
+    "proof",
+    "cryptographic"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
     "@reclaimprotocol/js-sdk": "^2.0.0",
-    "@reclaimprotocol/zk-fetch": "^0.1.0",
-    "openai": "^4.70.0"
+    "@reclaimprotocol/zk-fetch": "^0.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

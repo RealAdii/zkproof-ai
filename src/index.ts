@@ -10,9 +10,8 @@ import type {
   SerializedClaudeProof,
 } from "./types.js";
 
-// Re-export everything
+// Re-export types
 export * from "./types.js";
-export * from "./eigenai.js";
 
 const ANTHROPIC_API_ENDPOINT = "https://api.anthropic.com/v1";
 const ANTHROPIC_VERSION = "2023-06-01";
