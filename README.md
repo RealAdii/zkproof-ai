@@ -1,6 +1,4 @@
-# Verifiable AI Inference
-
-**Cryptographic proof that AI responses are real.**
+# Prove it's actually AI
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
